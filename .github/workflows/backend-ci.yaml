@@ -24,7 +24,7 @@ jobs:
         run: cd starter/backend && pipenv install
       # Run the linter.
       - name: linter
-        use: advanced-security/python-lint-code-scanning-action@v1
+        uses: advanced-security/python-lint-code-scanning-action@v1
         with:
           linter: pylint
 
