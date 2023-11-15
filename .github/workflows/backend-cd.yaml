@@ -1,0 +1,103 @@
+name: cd-backend
+
+# Ensure the workflow runs on schedule (Sunday at 0:00) and on push to the main branch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - starter/backend/**
+  
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the code from the repository.
+      - name: Checkout code
+        uses: actions/checkout@v3
+      # Set up a Node.js environment using the specified node version.
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:  
+          python-version: '3.10'
+      # Dependencies
+      - name: dependencies
+        run: cd starter/backend && pip install pipenv && pipenv install
+      # Run the linter.
+      - name: linter
+        uses: advanced-security/python-lint-code-scanning-action@v1
+        with:
+          linter: pylint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the code from the repository.
+      - name: Checkout code
+        uses: actions/checkout@v3
+      # Set up a Node.js environment using the specified node version.
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:  
+          python-version: '3.10'
+      # Install the dependencies.
+      - name: dependencies
+        run: cd starter/backend && pip install pipenv && pipenv install
+      # Run the tests.
+      - name: test
+        run: cd starter/backend/ && pipenv run test
+        
+
+  build:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the code from the repository.
+      - name: Checkout code
+        uses: actions/checkout@v3
+      # Config aws
+      - name: Configure AWS Credentials  
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.REGION }}
+      # Log ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build
+        uses: docker/build-push-action@v5
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: backend
+          IMAGE_TAG: ${{ github.sha }}
+          REACT_APP_MOVIE_API_URL: ${{ vars.REACT_APP_MOVIE_API_URL }}
+        with:
+          context: starter/backend/.
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            REACT_APP_MOVIE_API_URL=${{ env.REACT_APP_MOVIE_API_URL }}
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+        id: install
+        
+      - name: update k8s
+        run: aws eks update-kubeconfig --name cluster-final --region ${{ secrets.REGION }}
+
+      - name: deploy to ecr
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: backend
+          IMAGE_TAG: ${{ github.sha }}
+        run: | 
+          cd starter/backend/k8s
+          kustomize edit set image backend=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+          kustomize build | kubectl apply -f -
