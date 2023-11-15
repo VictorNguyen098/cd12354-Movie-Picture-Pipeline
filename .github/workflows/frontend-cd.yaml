@@ -106,6 +106,6 @@ jobs:
           cd starter/frontend/k8s
           kustomize edit set image frontend=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
           kustomize build 
-          kubectl delete deployment.yaml
+          kubectl delete pods --all -A
           kubectl apply -f -
 
