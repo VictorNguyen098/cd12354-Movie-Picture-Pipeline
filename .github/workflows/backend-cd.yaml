@@ -47,6 +47,13 @@ jobs:
       # Run the tests.
       - name: test
         run: cd starter/backend/ && pipenv run test
+      
+      - name: test-fail
+        env:
+          FAIL_TEST: true
+        run: cd starter/backend && pipenv run test
+        continue-on-error: true
+
         
 
   build:
