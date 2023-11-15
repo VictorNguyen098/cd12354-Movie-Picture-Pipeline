@@ -46,7 +46,7 @@ jobs:
         run: cd starter/backend && pip install pipenv && pipenv install
       # Run the tests.
       - name: test
-        run: cd starter/backend/ && python test_app.py
+        run: cd starter/backend/ && pipenv run test
         
   build:
     needs: [lint, test]
@@ -65,7 +65,7 @@ jobs:
         run: cd starter/backend && pip install pipenv && pipenv install
       # Run the tests.
       - name: test
-        run: cd starter/backend/ && python test_app.py
+        run: cd starter/backend/ && pipenv run test
         
       - name: Build
         uses: docker/build-push-action@v5
