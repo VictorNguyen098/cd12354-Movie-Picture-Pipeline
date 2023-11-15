@@ -61,10 +61,29 @@ jobs:
       # Check out the code from the repository.
       - name: Checkout code
         uses: actions/checkout@v3
+      # Config aws
+      - name: Configure AWS Credentials  
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.REGION }}
+      # Log ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Build
         uses: docker/build-push-action@v5
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: frontend
+          IMAGE_TAG: ${{ github.sha }}
+          REACT_APP_MOVIE_API_URL: ${{ vars.REACT_APP_MOVIE_API_URL }}
         with:
           context: starter/frontend/.
-          push: False
+          push: true
+          tags: $REGISTRY/$REPOSITORY:$IMAGE_TAG
           build-args: |
-            REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }}
+            REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL
