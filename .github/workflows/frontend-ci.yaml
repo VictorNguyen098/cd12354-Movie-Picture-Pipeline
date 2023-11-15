@@ -25,10 +25,10 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
       - name: dependencies
-        run: cd backend && npm ci
+        run: cd starter/frontend && npm ci
       # Run the linter.
       - name: linter
-        run: cd backend && npm run lint
+        run: cd starter/frontend && npm run lint
 
   test:
     runs-on: ubuntu-latest
@@ -41,30 +41,19 @@ jobs:
         uses: actions/setup-node@v3
         with:
           cache: 'npm'
-      # 
-      - uses: actions/cache@v3
-        name: Cache ~/.stack
+      - name: Restore Cache
+        uses: actions/cache@v3
         with:
-          path: ~/.stack
-          key: ${{ runner.os }}-stack-global-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-stack-global-
-
-      - uses: actions/cache@v3
-        name: Cache .stack-work
-        with:
-          path: .stack-work
-          key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}-${{ hashFiles('**/*.hs') }}
-          restore-keys: |
-            ${{ runner.os }}-stack-work-
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
       # Run the tests.
       # Install the dependencies.
       - name: dependencies
-        run: cd backend && npm ci
-        
+        run: cd starter/frontend && npm ci
+
       - name: test
-        run: cd backend && npm run test
+        run: cd starter/frontend/src/components/__tests__ && npm run test
         
   build:
     needs: [lint, test]
