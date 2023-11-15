@@ -93,14 +93,16 @@ jobs:
         with:
           version: 'latest'
 
+      - name: update k8s
+        run: aws eks update-kubeconfig --name cluster-final --region ${{ secrets.REGION }}
+
       - name: deploy to ecr
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: frontend
           IMAGE_TAG: ${{ github.sha }}
-        runs: | 
+        run: | 
           cd starter/frontend/k8s
-          aws eks update-kubeconfig
           kustomize edit set image frontend=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
           kustomize build | kubectl apply -f -
 
