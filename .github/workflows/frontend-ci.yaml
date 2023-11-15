@@ -55,7 +55,7 @@ jobs:
         
   build:
     needs: [lint, test]
-    runs-on: docker
+    runs-on: ubuntu-latest
     steps:
       # Check out the code from the repository.
       - name: Checkout code
@@ -69,10 +69,12 @@ jobs:
         with:
           path: ~/.npm
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-
+      # Install the dependencies.
+      - name: dependencies
+        run: cd starter/frontend && npm ci
+      - name: test
+        run: cd starter/frontend/src/components/__tests__ && npm run test
+        
       - name: build project
         run: |
-            docker build starter/frontend/ --file Dockerfile 
-      - name: test
-        run: cd frontend/src/ && npm run setupTests
-        
+            docker build starter/frontend/ --file Dockerfile .
