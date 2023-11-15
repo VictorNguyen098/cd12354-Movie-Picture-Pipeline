@@ -1,0 +1,67 @@
+name: cd-frontend
+
+# Ensure the workflow runs on schedule (Sunday at 0:00) and on push to the main branch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - starter/frontend/**
+  
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the code from the repository.
+      - name: Checkout code
+        uses: actions/checkout@v3
+      # Set up a Node.js environment using the specified node version.
+      - name: Set up Node.js 
+        uses: actions/setup-node@v3
+      # Restore cache
+      - name: Restore Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      # Dependencies
+      - name: dependencies
+        run: cd starter/frontend && npm ci
+      # Run the linter.
+      - name: linter
+        run: cd starter/frontend && npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the code from the repository.
+      - name: Checkout code
+        uses: actions/checkout@v3
+      # Set up a Node.js environment using the specified node version.
+      - name: Set up Node.js 
+        uses: actions/setup-node@v3
+      # Restore cache
+      - name: Restore Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      # Install the dependencies.
+      - name: dependencies
+        run: cd starter/frontend && npm ci
+      # Run the tests.
+      - name: test
+        run: cd starter/frontend/src/components/__tests__ && npm run test
+
+  build:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        uses: docker/build-push-action@v5
+        with:
+          context: starter/backend/.
+          push: False
+          build-args: |
+            REACT_APP_MOVIE_API_URL=${{ env.REACT_APP_MOVIE_API_URL }}
