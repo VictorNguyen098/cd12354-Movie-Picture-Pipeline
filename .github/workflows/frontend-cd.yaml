@@ -58,6 +58,9 @@ jobs:
     needs: [lint, test]
     runs-on: ubuntu-latest
     steps:
+      # Check out the code from the repository.
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Build
         uses: docker/build-push-action@v5
         with:
