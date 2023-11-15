@@ -1,4 +1,4 @@
-name: ci-frontend
+name: ci-backend
 
 # Ensure the workflow runs on schedule (Sunday at 0:00) and on push to the main branch
 on:
@@ -7,7 +7,7 @@ on:
     branches:
       - main
     paths:
-      - starter/frontend/**
+      - starter/backend/**
   
 jobs:
   lint:
@@ -17,20 +17,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       # Set up a Node.js environment using the specified node version.
-      - name: Set up Node.js 
-        uses: actions/setup-node@v3
-      # Restore cache
-      - name: Restore Cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
       # Dependencies
       - name: dependencies
-        run: cd starter/frontend && npm ci
+        run: cd starter/backend && pipenv install
       # Run the linter.
       - name: linter
-        run: cd starter/frontend && npm run lint
+        use: advanced-security/python-lint-code-scanning-action@v1
+        with:
+          linter: pylint
 
   test:
     runs-on: ubuntu-latest
@@ -40,19 +36,13 @@ jobs:
         uses: actions/checkout@v3
       # Set up a Node.js environment using the specified node version.
       - name: Set up Node.js 
-        uses: actions/setup-node@v3
-      # Restore cache
-      - name: Restore Cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        uses: actions/setup-python@v4
       # Install the dependencies.
       - name: dependencies
-        run: cd starter/frontend && npm ci
+        run: cd starter/backend && pipenv install
       # Run the tests.
       - name: test
-        run: cd starter/frontend/src/components/__tests__ && npm run test
+        run: cd starter/backend/ && python test_app.py
         
   build:
     needs: [lint, test]
@@ -63,22 +53,16 @@ jobs:
         uses: actions/checkout@v3
       # Set up a Node.js environment
       - name: Set up Node.js 
-        uses: actions/setup-node@v3
-      # Restore cache
-      - name: Restore Cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        uses: actions/setup-python@v4
       # Install the dependencies.
       - name: dependencies
-        run: cd starter/frontend && npm ci
+        run: cd starter/backend && pipenv install
       # Run the tests.
       - name: test
-        run: cd starter/frontend/src/components/__tests__ && npm run test
+        run: cd starter/backend/ && python test_app.py
         
       - name: Build
         uses: docker/build-push-action@v5
         with:
-          context: starter/frontend/.
+          context: starter/backend/.
           push: False
