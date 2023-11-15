@@ -72,9 +72,12 @@ jobs:
       # Install the dependencies.
       - name: dependencies
         run: cd starter/frontend && npm ci
+
       - name: test
         run: cd starter/frontend/src/components/__tests__ && npm run test
         
-      - name: build project
-        run: |
-            docker build starter/frontend/ --file Dockerfile .
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: starter/frontend/.
+          push: False
