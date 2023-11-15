@@ -84,6 +84,6 @@ jobs:
         with:
           context: starter/frontend/.
           push: true
-          tags: $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
           build-args: |
-            REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL
+            REACT_APP_MOVIE_API_URL=${{ env.REACT_APP_MOVIE_API_URL }}
