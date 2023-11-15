@@ -89,10 +89,11 @@ jobs:
             REACT_APP_MOVIE_API_URL=${{ env.REACT_APP_MOVIE_API_URL }}
 
       - name: Set up kubectl
-        uses: azure/setup-kubectl@v2
+        uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
-
+        id: install
+      
       - name: update k8s
         run: aws eks update-kubeconfig --name cluster-final --region ${{ secrets.REGION }}
 
