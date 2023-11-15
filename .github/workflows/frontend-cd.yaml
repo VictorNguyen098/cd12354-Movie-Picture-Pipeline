@@ -61,7 +61,7 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v5
         with:
-          context: starter/backend/.
+          context: starter/frontend/.
           push: False
           build-args: |
-            REACT_APP_MOVIE_API_URL=${{ env.REACT_APP_MOVIE_API_URL }}
+            REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }}
