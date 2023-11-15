@@ -69,7 +69,6 @@ jobs:
   build:
     needs: [lint, test]
     runs-on: docker
-    if: {{ sucess() }}
     steps:
       # Check out the code from the repository.
       - name: Checkout code
