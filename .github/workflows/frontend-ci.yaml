@@ -76,7 +76,7 @@ jobs:
       - name: test
         run: cd starter/frontend/src/components/__tests__ && npm run test
         
-        name: Build and push
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: starter/frontend/.
