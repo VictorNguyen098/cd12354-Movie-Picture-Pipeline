@@ -19,6 +19,8 @@ jobs:
       # Set up a Node.js environment using the specified node version.
       - name: Set up Node.js 
         uses: actions/setup-node@v3
+      - name: Clear caches
+        uses: easimon/wipe-cache@main
       # Restore cache
       - name: Restore Cache
         uses: actions/cache@v3
@@ -52,12 +54,12 @@ jobs:
         run: cd starter/frontend && npm ci
       # Run the tests.
       - name: test
-        run: cd starter/frontend/src && npm run test
+        run: cd starter/frontend/src/ && npm run test
 
       - name: test fail
         env:
           FAIL_TEST: true
-        run: cd starter/frontend/src && npm run test
+        run: cd starter/frontend/src/  && npm run test
         continue-on-error: true
  
   build:
