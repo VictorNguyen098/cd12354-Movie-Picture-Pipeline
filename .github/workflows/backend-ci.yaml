@@ -16,7 +16,7 @@ jobs:
       # Check out the code from the repository.
       - name: Checkout code
         uses: actions/checkout@v3
-      # Set up a Node.js environment using the specified node version.
+      # Set up a Python environment using the specified node version.
       - name: Set up Python
         uses: actions/setup-python@v4
         with:  
@@ -24,6 +24,9 @@ jobs:
       # Dependencies
       - name: dependencies
         run: cd starter/backend && pip install pipenv && pipenv install
+      # lint
+      - name: linter pip env
+        run: cd starter/backend && pipenv run lint
       # Run the linter.
       - name: linter
         uses: advanced-security/python-lint-code-scanning-action@v1
@@ -36,7 +39,7 @@ jobs:
       # Check out the code from the repository.
       - name: Checkout code
         uses: actions/checkout@v3
-      # Set up a Node.js environment using the specified node version.
+      # Set up a python environment using the specified node version.
       - name: Set up Python
         uses: actions/setup-python@v4
         with:  
@@ -47,7 +50,13 @@ jobs:
       # Run the tests.
       - name: test
         run: cd starter/backend/ && pipenv run test
-        
+      # run test fail
+      - name: test-fail
+        env:
+          FAIL_TEST: true
+        run: cd starter/backend && pipenv run test
+        continue-on-error: true
+
   build:
     needs: [lint, test]
     runs-on: ubuntu-latest
@@ -55,7 +64,7 @@ jobs:
       # Check out the code from the repository.
       - name: Checkout code
         uses: actions/checkout@v3
-      # Set up a Node.js environment
+      # Set up a python environment
       - name: Set up Python
         uses: actions/setup-python@v4
         with:  
@@ -66,7 +75,12 @@ jobs:
       # Run the tests.
       - name: test
         run: cd starter/backend/ && pipenv run test
-        
+      # run test fail
+      - name: test-fail
+        env:
+          FAIL_TEST: true
+        run: cd starter/backend && pipenv run test
+        continue-on-error: true
       - name: Build
         uses: docker/build-push-action@v5
         with:
