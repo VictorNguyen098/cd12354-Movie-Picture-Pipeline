@@ -30,7 +30,7 @@ jobs:
         run: cd starter/frontend && npm ci
       # Run the linter.
       - name: linter
-        run: cd starter/frontend && npm run lint --fix
+        run: cd starter/frontend && npm run lint
 
   test:
     runs-on: ubuntu-latest
