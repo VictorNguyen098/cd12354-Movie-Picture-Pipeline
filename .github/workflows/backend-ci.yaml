@@ -23,7 +23,7 @@ jobs:
           python-version: '3.10'
       # Dependencies
       - name: dependencies
-        run: cd starter/backend && pip install pipenv && pipenv install
+        run: cd starter/backend && pip install pipenv flake8 && pipenv install
       # lint
       - name: linter pip env
         run: cd starter/backend && pipenv run lint
