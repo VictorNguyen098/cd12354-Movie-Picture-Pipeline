@@ -52,7 +52,13 @@ jobs:
         run: cd starter/frontend && npm ci
       # Run the tests.
       - name: test
-        run: cd starter/frontend/src/components/__tests__ && npm run test
+        run: cd starter/frontend/src && npm run test
+
+      - name: test fail
+        env:
+          FAIL_TEST: true
+        run: cd starter/frontend/src && npm run test
+        continue-on-error: true
         
   build:
     needs: [lint, test]
@@ -75,7 +81,13 @@ jobs:
         run: cd starter/frontend && npm ci
       # Run the tests.
       - name: test
-        run: cd starter/frontend/src/components/__tests__ && npm run test
+        run: cd starter/frontend/src && npm run test
+
+      - name: test fail
+        env:
+          FAIL_TEST: true
+        run: cd starter/frontend/src && npm run test
+        continue-on-error: true
         
       - name: Build
         uses: docker/build-push-action@v5

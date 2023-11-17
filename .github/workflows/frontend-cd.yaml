@@ -52,14 +52,14 @@ jobs:
         run: cd starter/frontend && npm ci
       # Run the tests.
       - name: test
-        run: cd starter/frontend/src/components/__tests__ && npm run test
+        run: cd starter/frontend/src && npm run test
 
       - name: test fail
         env:
           FAIL_TEST: true
-        run: cd starter/frontend/src/components/__tests__ && npm run test
+        run: cd starter/frontend/src && npm run test
         continue-on-error: true
-
+ 
   build:
     needs: [lint, test]
     runs-on: ubuntu-latest
@@ -101,7 +101,7 @@ jobs:
         id: install
         
       - name: update k8s
-        run: aws eks update-kubeconfig --name cluster-final --region ${{ secrets.REGION }}
+        run: aws eks update-kubeconfig --name cluster --region ${{ secrets.REGION }}
 
       - name: deploy to ecr
         env:
@@ -111,6 +111,5 @@ jobs:
         run: | 
           cd starter/frontend/k8s
           kustomize edit set image frontend=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
-          # kubectl delete pods --all -A
           kustomize build | kubectl apply -f -
 

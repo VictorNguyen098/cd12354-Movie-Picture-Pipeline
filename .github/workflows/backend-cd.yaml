@@ -97,7 +97,7 @@ jobs:
         id: install
         
       - name: update k8s
-        run: aws eks update-kubeconfig --name cluster-final --region ${{ secrets.REGION }}
+        run: aws eks update-kubeconfig --name cluster --region ${{ secrets.REGION }}
 
       - name: deploy to ecr
         env:
