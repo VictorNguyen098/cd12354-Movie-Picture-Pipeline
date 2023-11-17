@@ -19,8 +19,6 @@ jobs:
       # Set up a Node.js environment using the specified node version.
       - name: Set up Node.js 
         uses: actions/setup-node@v3
-      - name: Clear caches
-        uses: easimon/wipe-cache@main
       # Restore cache
       - name: Restore Cache
         uses: actions/cache@v3
@@ -103,7 +101,7 @@ jobs:
         id: install
         
       - name: update k8s
-        run: aws eks update-kubeconfig --name cluster --region ${{ secrets.REGION }}
+        run: aws eks update-kubeconfig --name ${{ vars.CLUSTER_NAME }} --region ${{ secrets.REGION }}
 
       - name: deploy to ecr
         env:
